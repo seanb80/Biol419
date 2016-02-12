@@ -136,7 +136,7 @@ title('Mean Global Neonatal Death Rate per 1000 live births by national income c
 
 initialdata = awfulnum(:,20);
 trainingindicies = randsample(1:194, 125);
-testindicies = 1:125;
+testindicies = 1:194;
 
 testindicies(ismember(testindicies,trainingindicies)) = [];
 

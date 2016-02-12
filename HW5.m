@@ -130,3 +130,45 @@ legend('low income', 'mid income', 'high income');
 xlabel('Year');
 ylabel('Mean global neonatal death rate / 1000 live births');
 title('Mean Global Neonatal Death Rate per 1000 live births by national income class');
+
+
+%% Extra Credit
+
+initialdata = awfulnum(:,20);
+trainingindicies = randsample(1:194, 125);
+testindicies = 1:125;
+
+testindicies(ismember(testindicies,trainingindicies)) = [];
+
+trainingdata = initialdata(trainingindicies, :);
+testdata = initialdata(testindicies, :);
+
+initincomedata = awfuldata.CountryIncomeGroup;
+
+
+for(i = 1:length(initincomedata))
+    
+    if(isequal(initincomedata{i}, 'High income: OECD'))
+        initincomedata{i} = 'High';
+    elseif(isequal(initincomedata{i}, 'High income: nonOECD'))
+        initincomedata{i} = 'High';
+    elseif(isequal(initincomedata{i}, 'Lower middle income'))
+        initincomedata{i} = 'Mid';
+    elseif(isequal(initincomedata{i},'Upper middle income'))
+        initincomedata{i} = 'Mid';
+    elseif(isequal(initincomedata{i},'Low income'))
+        initincomedata{i} = 'Low';
+    end;
+end;
+
+trainingincome = initincomedata(trainingindicies);
+
+test = categorical(trainingincome)
+classify(testdata, trainingdata, test', 'Linear')
+
+
+
+
+
+
+

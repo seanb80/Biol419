@@ -162,11 +162,12 @@ for(i = 1:length(initincomedata)) % Cleans up income data group to just have Hig
 end;
 
 trainingincome = initincomedata(trainingindicies); % Creates a vector of income groups corresponding to training data indicies
+testincome = initincomedat(testindicies);
 
 test = categorical(trainingincome) % Turns trainingincome into a catagorical variable for the classify() function
 classify(testdata, trainingdata, test', 'Linear') % Actual classify call taht returns a vector of what it guesses to be the income group of supplied test data
 
-
+val = ismember(classify(testdata, trainingdata, test', 'Linear'), testincome);
 
 
 

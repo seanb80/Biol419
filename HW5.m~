@@ -6,12 +6,9 @@ awfuldata = readtable('Neonatal_Mortality.xlsx', 'ReadVariableNames', ...
 % This mess of ugly corrects the random sequential order year based data
 % was arranged in the original dataset, as well as correcting the
 % importation as a string value as opposed to a numerical/double
-% I spent some time trying to figure out how to use loops to concatenate
-% the .x#### portion of the original data set addressing, but was unable to
-% create a functional single string object, for some reason horzcat and a
-% few of it's derivatives would produce 'x','1','9',9','0' as opposed to
-% 'x1990'. Go back and figure out how to make that work better, or find
-% some version of the paste command.
+
+% Cooper explained how to make this work more elegantly, but... meh.
+
 awfulnum(1,:) = str2double(awfuldata.x1990);
 awfulnum(2,:) = str2double(awfuldata.x1991);
 awfulnum(3,:) = str2double(awfuldata.x1992);
@@ -85,7 +82,7 @@ figure;
 hist(awful2015, 8:8:80)
 xlabel('Deaths per 1000 live births')
 ylabel('Count')
-title('Histogram of neonatal births per 1000 live births, worldwide in 1990')
+title('Histogram of neonatal births per 1000 live births, worldwide in 2015')
 
 %% Question 3
 
@@ -101,6 +98,7 @@ title('Neonatal Mortality Trend in Malawi, 1990-2015');
 
 %% Question 4
 
+awfulnum = awfulnum';
 lowinc = find(strcmp('Low income', awfuldata.CountryIncomeGroup));
 uncatinc = find(strcmp('-', awfuldata.CountryIncomeGroup)); 
 
@@ -114,10 +112,63 @@ awfulmidinc2 = find(strcmp('Upper middle income', awfuldata.CountryIncomeGroup))
 highinc = vertcat(awfulhighinc1, awfulhighinc2);
 midinc = vertcat(awfulmidinc1, awfulmidinc2);
 
-for(i = 1:
-lowmean = mean(lowinc);
-midmean = mean(midinc);
-highmean = mean(highinc);
+lowdata = awfulnum(lowinc, :);
+middata = awfulnum(midinc, :);
+highdata = awfulnum(highinc, :);
 
-boxplot(lowmean, midmean, highmean)
+lowmean = mean(lowdata,1);
+midmean = mean(middata,1);
+highmean = mean(highdata,1);
+
+figure;
+plot(1990:2015, lowmean, 'r')
+hold on;
+plot(1990:2015, midmean, 'c');
+plot(1990:2015, highmean, 'b');
+hold off;
+legend('low income', 'mid income', 'high income');
+xlabel('Year');
+ylabel('Mean global neonatal death rate / 1000 live births');
+title('Mean Global Neonatal Death Rate per 1000 live births by national income class');
+
+
+%% Extra Credit
+
+initialdata = awfulnum(:,20);
+trainingindicies = randsample(1:194, 125);
+testindicies = 1:125;
+
+testindicies(ismember(testindicies,trainingindicies)) = [];
+
+trainingdata = initialdata(trainingindicies, :);
+testdata = initialdata(testindicies, :);
+
+initincomedata = awfuldata.CountryIncomeGroup;
+
+
+for(i = 1:length(initincomedata))
+    
+    if(isequal(initincomedata{i}, 'High income: OECD'))
+        initincomedata{i} = 'High';
+    elseif(isequal(initincomedata{i}, 'High income: nonOECD'))
+        initincomedata{i} = 'High';
+    elseif(isequal(initincomedata{i}, 'Lower middle income'))
+        initincomedata{i} = 'Mid';
+    elseif(isequal(initincomedata{i},'Upper middle income'))
+        initincomedata{i} = 'Mid';
+    elseif(isequal(initincomedata{i},'Low income'))
+        initincomedata{i} = 'Low';
+    end;
+end;
+
+trainingincome = initincomedata(trainingindicies);
+
+test = categorical(trainingincome)
+classify(testdata, trainingdata, test', 'Linear')
+
+
+
+
+
+
 

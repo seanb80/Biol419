@@ -1,4 +1,6 @@
 %%
+clear all;
+close all;
 
 awfuldata = readtable('Neonatal_Mortality.xlsx', 'ReadVariableNames', ...
     true, 'Range', 'A1:CA195');
@@ -161,15 +163,27 @@ for(i = 1:length(initincomedata)) % Cleans up income data group to just have Hig
     end;
 end;
 
+niter = 400;
+val = zeros(niter,1);
+
+for(i = 1:niter)
+trainingindicies = randsample(1:194, 125); % random numbers to generate test data and income grouping
+testindicies = 1:194; % Lame hack to get the indicies that aren't in the training set
+
+testindicies(ismember(testindicies,trainingindicies)) = []; % deletes any values taht exist in both training and test sets
+
+trainingdata = initialdata(trainingindicies, :); % Creates vector of neonatal death rates from training indicies
+testdata = initialdata(testindicies, :);  % Creates vector of neonatal death rates from test inidices
+
 trainingincome = initincomedata(trainingindicies); % Creates a vector of income groups corresponding to training data indicies
-testincome = initincomedat(testindicies);
+testincome = initincomedata(testindicies);
 
-test = categorical(trainingincome) % Turns trainingincome into a catagorical variable for the classify() function
-classify(testdata, trainingdata, test', 'Linear') % Actual classify call taht returns a vector of what it guesses to be the income group of supplied test data
+test = categorical(trainingincome); % Turns trainingincome into a catagorical variable for the classify() function
+classify(testdata, trainingdata, test', 'Linear'); % Actual classify call taht returns a vector of what it guesses to be the income group of supplied test data
 
-val = ismember(classify(testdata, trainingdata, test', 'Linear'), testincome);
+val(i,1) = mean(ismember(classify(testdata, trainingdata, test', 'Linear'), testincome));
 
+end;
 
-
-
+mean(val)
 

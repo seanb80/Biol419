@@ -187,3 +187,6 @@ end;
 
 mean(val)
 
+% I spent probably 3 hours working on the homework, plus another 2-3
+% helping my group. 
+

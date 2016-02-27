@@ -26,23 +26,19 @@ refline(0, 0.95);
 line([52 52],[0 1]);
 hold off;
 
-trainingindicies = randsample(1:numTumors, 66);
-testindicies = 1:83;
-testindicies(ismember(testindicies,trainingindicies)) = [];
+% trainingindicies = randsample(1:numTumors, 66);
+% testindicies = 1:83;
+% testindicies(ismember(testindicies,trainingindicies)) = [];
+% 
+% trainingdata = X(trainingindicies,:);
+% testdata = X(testindicies,:);
+% trainingClass = G(trainingindicies);
+% testClass = G(testindicies);
 
-trainingdata = X(trainingindicies,:);
-testdata = X(testindicies,:);
-trainingClass = G(trainingindicies);
-testClass = G(testindicies);
+linClass = fitcdiscr(scorePC(:,1:10), G);
+quadClass = fitcdiscr(scorePC(:,1:10), G, 'DiscrimType', 'quadratic');
 
-%%
-
-linClass = fitcdiscr(trainingdata, trainingClass, 'DiscrimType', 'linear');
-testPred = predict(linClass, testdata);
-acc = mean(testPred' - testClass);
-
-quadClass = fitcdiscr(trainingdata, trainingClass, 'DiscrimType', 'quad');
-quadPred = predict(quadClass, testdata);
+linPred = predict(linClass, G);
 
 
 %% Question 2
@@ -56,3 +52,5 @@ numMeas = size(meas,2);
 % Width, and Sepal Length, measured in mm
 
 kmeans2 = kmeans(meas, 2);
+kmeans3 = kmeans(meas, 3);
+kmeans4 = kmeans(meas, 4);

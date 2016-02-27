@@ -26,20 +26,11 @@ refline(0, 0.95);
 line([52 52],[0 1]);
 hold off;
 
-% trainingindicies = randsample(1:numTumors, 66);
-% testindicies = 1:83;
-% testindicies(ismember(testindicies,trainingindicies)) = [];
-% 
-% trainingdata = X(trainingindicies,:);
-% testdata = X(testindicies,:);
-% trainingClass = G(trainingindicies);
-% testClass = G(testindicies);
 
-linClass = fitcdiscr(scorePC(:,1:10), G);
-quadClass = fitcdiscr(scorePC(:,1:10), G, 'DiscrimType', 'quadratic');
+linClass = fitcdiscr(scorePC(:, 1:10), G);
+quadClass = fitcdiscr(scorePC(:, 1:10), G, 'DiscrimType', 'quadratic');
 
-linPred = predict(linClass, G);
-
+treeDiscr = fitctree(scorePC(:, 1:10), G);
 
 %% Question 2
 
@@ -51,6 +42,11 @@ numMeas = size(meas,2);
 % The measruements Ronald Fisher took were Petal Width, Petal Length, Sepal
 % Width, and Sepal Length, measured in mm
 
+[coeffPC2, scorePC2, latentPC2] = pca(meas);
+
+gscatter(scorePC2(:, 1), scorePC2(:, 2), species);
+
 kmeans2 = kmeans(meas, 2);
 kmeans3 = kmeans(meas, 3);
 kmeans4 = kmeans(meas, 4);
+

@@ -26,24 +26,11 @@ refline(0, 0.95);
 line([52 52],[0 1]);
 hold off;
 
-trainingindicies = randsample(1:numTumors, 66);
-testindicies = 1:83;
-testindicies(ismember(testindicies,trainingindicies)) = [];
 
-trainingdata = X(trainingindicies,:);
-testdata = X(testindicies,:);
-trainingClass = G(trainingindicies);
-testClass = G(testindicies);
+linClass = fitcdiscr(scorePC(:, 1:10), G);
+quadClass = fitcdiscr(scorePC(:, 1:10), G, 'DiscrimType', 'quadratic');
 
-%%
-
-linClass = fitcdiscr(trainingdata, trainingClass, 'DiscrimType', 'linear');
-testPred = predict(linClass, testdata);
-acc = mean(testPred' - testClass);
-
-quadClass = fitcdiscr(trainingdata, trainingClass, 'DiscrimType', 'quad');
-quadPred = predict(quadClass, testdata);
-
+treeDiscr = fitctree(scorePC(:, 1:10), G);
 
 %% Question 2
 
@@ -55,4 +42,23 @@ numMeas = size(meas,2);
 % The measruements Ronald Fisher took were Petal Width, Petal Length, Sepal
 % Width, and Sepal Length, measured in mm
 
+[coeffPC2, scorePC2, latentPC2] = pca(meas);
+
+figure; 
+gscatter(scorePC2(:, 1), scorePC2(:, 2), species);
+title('Iris measurements PCs 1 and 2 grouped by actual species');
+
 kmeans2 = kmeans(meas, 2);
+figure;
+gscatter(scorePC2(:, 1), scorePC2(:, 2), kmeans2);
+title('Iris measurements PCs 1 and 2 grouped by K-means = 2');
+
+kmeans3 = kmeans(meas, 3);
+figure;
+gscatter(scorePC2(:, 1), scorePC2(:, 2), kmeans3);
+title('Iris measurements PCs 1 and 2 grouped by K-means = 3');
+
+kmeans4 = kmeans(meas, 4);
+figure;
+gscatter(scorePC2(:, 1), scorePC2(:, 2), kmeans4);
+title('Iris measurements PCs 1 and 2 grouped by K-means = 4');

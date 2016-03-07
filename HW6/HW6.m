@@ -28,14 +28,16 @@ hold off;
 
 linCValAcc = zeros(400,1);
 quadCValAcc = zeros(400,1);
+
 for i = 1:400
+
 trainingindicies = randsample(1:83, 60);
 testindicies = 1:83;
 testindicies(ismember(testindicies,trainingindicies)) = [];
-
+ 
 trainingdata = X(trainingindicies, :);
 testdata = X(testindicies, :);
-
+ 
 trainingclass = G(trainingindicies);
 testclass = G(testindicies);
 
@@ -52,6 +54,21 @@ linCValAcc(i) = mean(predictedLinClass == testclass');
 quadCValAcc(i) = mean(predictedQuadClass == testclass');
 
 end;
+
+avgLinearCrossVal = mean(linCValAcc)
+avgQuadraticCrossVal = mean(quadCValAcc)
+
+% My mean linear and quadratic cross validated accuracies are 22.9% and 
+% 26.0%. This seems low, but I can't identify anything incorrect in my
+% implementation of the PCA/fitcdiscr functionality so I assume there's
+% some sort of logic error in my test/training data set creation in the
+% loop, or the test data actually passed to predict. I was a little fuzzy
+% on that.
+% Not sure, but it at least compiles and produces a number!
+
+
+%%
+
 % Decision trees are super cool. They seek to partition data space into a
 % dichotomous outcome, is a, or is not a for example that minimizes 
 % "impurity". It does this recursively, producing some sort of tree that
@@ -63,9 +80,34 @@ end;
 % trying to determine disease load based upon multiple terrain and
 % oceanographic types)
 
-treeDiscr = fitctree(scorePC(:, 1:10), G);
+treeCVal = zeros(400,1);
 
+for i = 1:400
 
+trainingindicies = randsample(1:83, 60);
+testindicies = 1:83;
+testindicies(ismember(testindicies,trainingindicies)) = [];
+ 
+trainingdata = X(trainingindicies, :);
+testdata = X(testindicies, :);
+ 
+trainingclass = G(trainingindicies);
+testclass = G(testindicies);
+
+[trainingcoeffPC, trainingscorePC, traininglatentPC] = pca(trainingdata);
+
+treeDiscr = fitctree(trainingscorePC(:, 1:10), trainingclass);
+
+treePredict = predict(treeDiscr, testdata(:, 1:10));
+
+treeCVal(i) = mean(treePredict == testclass');
+
+end
+% the Decision tree has ~ 25% cross validated accuracy. Still somewhat
+% sucky. I'm pretty sure it's a problem with the predict function, but I
+% don't know how to fix it. I'm still unsure of what exactly the first 10
+% PCs represents in my data, like how do I access the test data that
+% corresponds to those PCs, or is there any way to represent that data?
 
 %% Question 2
 
